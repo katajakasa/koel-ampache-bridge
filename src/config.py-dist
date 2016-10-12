@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+
+DEBUG = False
+
+KOEL_DATABASE_URL = 'sqlite:///database.db'
+BRIDGE_ADDR = 'http://koel-bridge.mydomain.com'
+KOEL_ADDR = 'http://koel.mydomain.com'
+
+MUSIC_DIR = '/mnt/music'
+
+# Don't change these
+VERSION = "350001"
+BRIDGE_COVERS = KOEL_ADDR+'/public/img/covers/'
+BRIDGE_PLAY = BRIDGE_ADDR+'/server/custom/play.php'
