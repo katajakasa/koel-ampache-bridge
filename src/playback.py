@@ -14,14 +14,12 @@ def stream_audio():
     song = Song.get_one(id=request.args.get('id'))
 
     # A hack to get my local dev env working
+    path = song.path
     if config.DEBUG:
         cut = '/mnt/storage/audio/music/'
-        path = song.path[len(cut):]
-    else:
-        path = song.path
+        path = os.path.join(config.MUSIC_DIR, song.path[len(cut):])
 
     # Find the file and guess type
-    path = os.path.join(config.MUSIC_DIR, path)
     mime = mimetypes.guess_type(path)[0]
     ext = mimetypes.guess_extension(mime)
 

@@ -3,3 +3,4 @@ flask
 flask-sqlalchemy
 tabulate
 pymysql
+uwsgi
