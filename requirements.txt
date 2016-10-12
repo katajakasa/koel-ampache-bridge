@@ -2,3 +2,4 @@ arrow
 flask
 flask-sqlalchemy
 tabulate
+pymysql
