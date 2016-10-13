@@ -110,6 +110,22 @@ def do_albums():
 
 
 @is_authenticated
+def do_album():
+    album_filter = request.args.get('album', 0)
+    n_root = Etree.Element("root")
+
+    album = Album.get_one(id=album_filter)
+    artist = Artist.get_one(id=album.artist_id)
+
+    a_node = Etree.SubElement(n_root, "album", id=str(album.id))
+    Etree.SubElement(a_node, "name").text = album.name
+    Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
+    if album.cover:
+        Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+    return n_root
+
+
+@is_authenticated
 def do_playlists():
     n_root = Etree.Element("root")
     return n_root
@@ -165,6 +181,7 @@ def route_action():
             'ping': do_ping,
             'artists': do_artists,
             'albums': do_albums,
+            'album': do_album,
             'playlists': do_playlists,
             'artist_albums': do_artist_albums,
             'album_songs': do_album_songs
