@@ -172,6 +172,27 @@ def do_album_songs():
     return n_root
 
 
+@is_authenticated
+def do_song():
+    song_filter = request.args.get('filter', 0)
+
+    song = Song.get_one(id=song_filter)
+    artist = Artist.get_one_or_none(id=song.contributing_artist_id)
+    album = Album.get_one_or_none(id=song.album_id)
+
+    n_root = Etree.Element("root")
+    a_node = Etree.SubElement(n_root, "song", id=str(song.id))
+    Etree.SubElement(a_node, "title").text = song.title
+    Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
+    if artist:
+        Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
+    if album:
+        Etree.SubElement(a_node, "album", id=str(album.id)).text = album.name
+    if album.cover:
+        Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+    return n_root
+
+
 # Route request to the correct place
 def route_action():
     action = request.args.get('action')
@@ -183,6 +204,7 @@ def route_action():
             'albums': do_albums,
             'album': do_album,
             'playlists': do_playlists,
+            'song': do_song,
             'artist_albums': do_artist_albums,
             'album_songs': do_album_songs
         }[action]()
