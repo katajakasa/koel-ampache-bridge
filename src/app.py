@@ -177,7 +177,7 @@ def do_album_songs():
 @is_authenticated
 def do_song():
     song_filter = request.args.get('filter', 0)
-    song_filter_id = hex(song_filter)[2:]
+    song_filter_id = hex(int(song_filter))[2:]
 
     song = Song.query.filter(Song.id.like(song_filter_id+'%')).one()
     artist = Artist.get_one_or_none(id=song.contributing_artist_id)
