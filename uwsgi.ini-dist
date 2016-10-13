@@ -1,0 +1,9 @@
+[uwsgi]
+chdir           = /my/path/
+module          = wsgi
+home            = /my/virtualenv/path/
+master          = true
+processes       = 3
+socket          = /var/run/koel-bridge.sock
+chmod-socket    = 664
+vacuum          = true
