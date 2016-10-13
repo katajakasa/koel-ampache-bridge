@@ -139,13 +139,18 @@ def do_album_songs():
 # Route request to the correct place
 def route_action():
     action = request.args.get('action')
-    e_root = {
-        'handshake': do_handshake,
-        'ping': do_ping,
-        'artists': do_artists,
-        'artist_albums': do_artist_albums,
-        'album_songs': do_album_songs
-    }[action]()
+    try:
+        e_root = {
+            'handshake': do_handshake,
+            'ping': do_ping,
+            'artists': do_artists,
+            'artist_albums': do_artist_albums,
+            'album_songs': do_album_songs
+        }[action]()
+    except KeyError:
+        e_root = Etree.Element("root")
+        Etree.SubElement(e_root, "error", code="405").text = "Feature not implemented"
+
     output = Etree.tostring(e_root, encoding='UTF-8')
     print(output)
     return Response(output, mimetype='application/xml')
