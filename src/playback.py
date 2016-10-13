@@ -34,16 +34,19 @@ def stream_audio():
     # Send some extra headers
     headers = Headers()
     headers.add('Content-Transfer-Encoding', 'binary')
-    headers.add('Content-Length', os.path.getsize(path))
+    if not transcode:
+        headers.add('Content-Length', os.path.getsize(path))
 
     def generate_audio():
         if not transcode:
+            print("Direct stream!")
             with open(path, "rb") as handle:
                 data = handle.read(1024)
                 while data:
                     yield data
                     data = handle.read(1024)
         else:
+            print("Transcoding!")
             tc = audiotranscode.AudioTranscode()
             for data in tc.transcode_stream(path, 'mp3'):
                 yield data
