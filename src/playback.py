@@ -4,8 +4,10 @@ import mimetypes
 import os
 
 from flask import Response, request
+from werkzeug.datastructures import Headers
 import audiotranscode
 
+from utils import generate_random_key
 from tables import Song
 import config
 
@@ -28,6 +30,12 @@ def stream_audio():
     if ext not in ['.mp3', '.ogg']:
         transcode = True
         mime = "audio/mpeg"
+        ext = '.mp3'
+
+    # Send some extra headers
+    headers = Headers()
+    headers.add('Content-Transfer-Encoding', 'binary')
+    headers.add('Content-Length', os.path.getsize(path))
 
     def generate_audio():
         if not transcode:
@@ -40,4 +48,4 @@ def stream_audio():
             tc = audiotranscode.AudioTranscode()
             for data in tc.transcode_stream(path, 'mp3'):
                 yield data
-    return Response(generate_audio(), mimetype=mime)
+    return Response(generate_audio(), mimetype=mime, headers=headers)
