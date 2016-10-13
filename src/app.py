@@ -156,12 +156,10 @@ def do_album_songs():
 
     n_root = Etree.Element("root")
     for song in Song.get_many(album_id=album_filter):
-        int_id = int(song.id[:8], 16)
-
         artist = Artist.get_one_or_none(id=song.contributing_artist_id)
         album = Album.get_one_or_none(id=song.album_id)
 
-        a_node = Etree.SubElement(n_root, "song", id=str(int_id))
+        a_node = Etree.SubElement(n_root, "song", id=str(song.id))
         Etree.SubElement(a_node, "title").text = song.title
         Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
         if artist:
@@ -177,16 +175,13 @@ def do_album_songs():
 @is_authenticated
 def do_song():
     song_filter = request.args.get('filter', 0)
-    song_filter_id = hex(int(song_filter))[2:]
 
-    song = Song.query.filter(Song.id.like(song_filter_id+'%')).one()
+    song = Song.get_one(id=song_filter)
     artist = Artist.get_one_or_none(id=song.contributing_artist_id)
     album = Album.get_one_or_none(id=song.album_id)
 
-    int_id = int(song.id[:8], 16)
-
     n_root = Etree.Element("root")
-    a_node = Etree.SubElement(n_root, "song", id=str(int_id))
+    a_node = Etree.SubElement(n_root, "song", id=str(song.id))
     Etree.SubElement(a_node, "title").text = song.title
     Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
     if artist:

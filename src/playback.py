@@ -30,7 +30,6 @@ def stream_audio():
     if ext not in ['.mp3', '.ogg']:
         transcode = True
         mime = "audio/mpeg"
-        ext = '.mp3'
 
     # Send some extra headers
     headers = Headers()
