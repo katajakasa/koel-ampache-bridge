@@ -10,6 +10,7 @@ from datetime import datetime
 
 from utils import generate_random_key
 from tables import Artist, Album, Song, BridgeSession, BridgeUser, User, db
+from renderers import render_album, render_artist, render_song
 import config
 
 
@@ -83,15 +84,9 @@ def do_ping():
 
 @is_authenticated
 def do_artists():
-    limit = request.args.get('limit', 0)
-
     n_root = Etree.Element("root")
     for artist in Artist.get_many():
-        a_node = Etree.SubElement(n_root, "artist", id=str(artist.id))
-        Etree.SubElement(a_node, "name").text = artist.name
-        Etree.SubElement(a_node, "albums").text = "0"
-        Etree.SubElement(a_node, "songs").text = "0"
-
+        render_artist(n_root, artist)
     return n_root
 
 
@@ -99,29 +94,18 @@ def do_artists():
 def do_albums():
     n_root = Etree.Element("root")
     for album in Album.get_many():
-        artist = Artist.get_one(id=album.artist_id)
-
-        a_node = Etree.SubElement(n_root, "album", id=str(album.id))
-        Etree.SubElement(a_node, "name").text = album.name
-        Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
-        if album.cover:
-            Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+        render_album(n_root, album)
     return n_root
 
 
 @is_authenticated
 def do_album():
     album_filter = request.args.get('album', 0)
+
     n_root = Etree.Element("root")
-
     album = Album.get_one(id=album_filter)
-    artist = Artist.get_one(id=album.artist_id)
+    render_album(n_root, album)
 
-    a_node = Etree.SubElement(n_root, "album", id=str(album.id))
-    Etree.SubElement(a_node, "name").text = album.name
-    Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
-    if album.cover:
-        Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
     return n_root
 
 
@@ -133,41 +117,22 @@ def do_playlists():
 
 @is_authenticated
 def do_artist_albums():
-    limit = request.args.get('limit', 0)
     artist_filter = request.args.get('filter', 0)
 
     n_root = Etree.Element("root")
     for album in Album.get_many(artist_id=artist_filter):
-        artist = Artist.get_one(id=album.artist_id)
-
-        a_node = Etree.SubElement(n_root, "album", id=str(album.id))
-        Etree.SubElement(a_node, "name").text = album.name
-        Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
-        if album.cover:
-            Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+        render_album(n_root, album)
 
     return n_root
 
 
 @is_authenticated
 def do_album_songs():
-    limit = request.args.get('limit', 0)
     album_filter = request.args.get('filter', 0)
 
     n_root = Etree.Element("root")
     for song in Song.get_many(album_id=album_filter):
-        artist = Artist.get_one_or_none(id=song.contributing_artist_id)
-        album = Album.get_one_or_none(id=song.album_id)
-
-        a_node = Etree.SubElement(n_root, "song", id=str(song.id))
-        Etree.SubElement(a_node, "title").text = song.title
-        Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
-        if artist:
-            Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
-        if album:
-            Etree.SubElement(a_node, "album", id=str(album.id)).text = album.name
-        if album.cover:
-            Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+        render_song(n_root, song)
 
     return n_root
 
@@ -177,19 +142,9 @@ def do_song():
     song_filter = request.args.get('filter', 0)
 
     song = Song.get_one(id=song_filter)
-    artist = Artist.get_one_or_none(id=song.contributing_artist_id)
-    album = Album.get_one_or_none(id=song.album_id)
-
     n_root = Etree.Element("root")
-    a_node = Etree.SubElement(n_root, "song", id=str(song.id))
-    Etree.SubElement(a_node, "title").text = song.title
-    Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
-    if artist:
-        Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
-    if album:
-        Etree.SubElement(a_node, "album", id=str(album.id)).text = album.name
-    if album.cover:
-        Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+    render_song(n_root, song)
+
     return n_root
 
 
