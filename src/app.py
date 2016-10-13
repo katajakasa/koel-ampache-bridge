@@ -163,9 +163,9 @@ def do_album_songs():
         Etree.SubElement(a_node, "title").text = song.title
         Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
         if artist:
-            Etree.SubElement(a_node, "artist").text = artist.name
+            Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
         if album:
-            Etree.SubElement(a_node, "album").text = album.name
+            Etree.SubElement(a_node, "album", id=str(album.id)).text = album.name
         if album.cover:
             Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
 
