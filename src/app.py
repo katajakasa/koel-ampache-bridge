@@ -96,6 +96,26 @@ def do_artists():
 
 
 @is_authenticated
+def do_albums():
+    n_root = Etree.Element("root")
+    for album in Album.get_many():
+        artist = Artist.get_one(id=album.artist_id)
+
+        a_node = Etree.SubElement(n_root, "album", id=str(album.id))
+        Etree.SubElement(a_node, "name").text = album.name
+        Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
+        if album.cover:
+            Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
+    return n_root
+
+
+@is_authenticated
+def do_playlists():
+    n_root = Etree.Element("root")
+    return n_root
+
+
+@is_authenticated
 def do_artist_albums():
     limit = request.args.get('limit', 0)
     artist_filter = request.args.get('filter', 0)
@@ -108,7 +128,7 @@ def do_artist_albums():
         Etree.SubElement(a_node, "name").text = album.name
         Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
         if album.cover:
-            Etree.SubElement(a_node, "art").text = "{}?id={}".format(config.BRIDGE_COVERS, album.cover)
+            Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
 
     return n_root
 
@@ -131,7 +151,7 @@ def do_album_songs():
         if album:
             Etree.SubElement(a_node, "album").text = album.name
         if album.cover:
-            Etree.SubElement(a_node, "art").text = "{}?id={}".format(config.BRIDGE_COVERS, album.cover)
+            Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
 
     return n_root
 
@@ -144,6 +164,8 @@ def route_action():
             'handshake': do_handshake,
             'ping': do_ping,
             'artists': do_artists,
+            'albums': do_albums,
+            'playlists': do_playlists,
             'artist_albums': do_artist_albums,
             'album_songs': do_album_songs
         }[action]()
@@ -152,7 +174,8 @@ def route_action():
         Etree.SubElement(e_root, "error", code="405").text = "Feature not implemented"
 
     output = Etree.tostring(e_root, encoding='UTF-8')
-    print(output)
+    if config.DEBUG:
+        print(output)
     return Response(output, mimetype='application/xml')
 
 
