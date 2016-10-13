@@ -33,15 +33,13 @@ def stream():
     return stream_audio()
 
 
-def init_app():
+def create_app():
     mimetypes.init()
     db.init_app(app)
     with app.app_context():
         db.create_all()
         db.session.commit()
-
-
+    return app
 
 if __name__ == '__main__':
-    init_app()
-    app.run()
+    create_app().run()

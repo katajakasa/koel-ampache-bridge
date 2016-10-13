@@ -1,5 +1,7 @@
-from src.main import app, init_app
+from src.main import create_app
+
+app = create_app()
 
 if __name__ == "__main__":
-    init_app()
     app.run()
+
