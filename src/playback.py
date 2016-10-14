@@ -2,6 +2,7 @@
 
 import mimetypes
 import os
+from binascii import hexlify
 
 from flask import Response, request
 from werkzeug.datastructures import Headers
@@ -76,5 +77,9 @@ def stream_audio():
         else:
             tc = audiotranscode.AudioTranscode()
             for data in tc.transcode_stream(path, 'mp3'):
-                yield data
+                hex_data = hexlify(data)
+                yield str(len(hex_data))
+                yield '\r\n'
+                yield hex_data
+                yield '\r\n'
     return Response(generate_audio(), mimetype=mime, headers=headers, status=status)
