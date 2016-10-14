@@ -91,6 +91,17 @@ def do_artists():
 
 
 @is_authenticated
+def do_artist():
+    artist_filter = int(request.args.get('filter', 0))
+
+    n_root = Etree.Element("root")
+    artist = Artist.get_one(id=artist_filter)
+    render_artist(n_root, artist)
+
+    return n_root
+
+
+@is_authenticated
 def do_albums():
     n_root = Etree.Element("root")
     for album in Album.get_many():
@@ -100,7 +111,7 @@ def do_albums():
 
 @is_authenticated
 def do_album():
-    album_filter = request.args.get('album', 0)
+    album_filter = int(request.args.get('filter', 0))
 
     n_root = Etree.Element("root")
     album = Album.get_one(id=album_filter)
@@ -116,8 +127,14 @@ def do_playlists():
 
 
 @is_authenticated
+def do_playlist():
+    n_root = Etree.Element("root")
+    return n_root
+
+
+@is_authenticated
 def do_artist_albums():
-    artist_filter = request.args.get('filter', 0)
+    artist_filter = int(request.args.get('filter', 0))
 
     n_root = Etree.Element("root")
     for album in Album.get_many(artist_id=artist_filter):
@@ -139,26 +156,53 @@ def ensure_bridge_song(song):
 
 @is_authenticated
 def do_album_songs():
-    album_filter = request.args.get('filter', 0)
+    album_filter = int(request.args.get('filter', 0))
 
     n_root = Etree.Element("root")
     for song in Song.get_many(album_id=album_filter):
-        bs = ensure_bridge_song(song)
-        render_song(n_root, song, bridge_song=bs)
+        bridge_song = ensure_bridge_song(song)
+        render_song(n_root, song, bridge_song=bridge_song)
+
+    return n_root
+
+
+@is_authenticated
+def do_artist_songs():
+    artist_filter = int(request.args.get('filter', 0))
+
+    n_root = Etree.Element("root")
+    for song in Song.get_many(contributing_artist_id=artist_filter):
+        bridge_song = ensure_bridge_song(song)
+        render_song(n_root, song, bridge_song=bridge_song)
 
     return n_root
 
 
 @is_authenticated
 def do_song():
-    song_filter = request.args.get('filter', 0)
+    song_filter = int(request.args.get('filter', 0))
 
     # Bridge song is hacky POS, but required because some players expect Integer ID's
     # and koel uses hash strings
     bridge_song = BridgeSong.get_one(id=song_filter)
     song = Song.get_one(id=bridge_song.song_id)
     n_root = Etree.Element("root")
-    render_song(n_root, song, bridge_song=bs)
+    render_song(n_root, song, bridge_song=bridge_song)
+
+    return n_root
+
+
+@is_authenticated
+def url_to_song():
+    url = request.args.get('url', '')
+    prefix = "{}?id=".format(config.BRIDGE_PLAY)
+
+    print(url[len(prefix):])
+    song = Song.get_one(id=url[len(prefix):])
+    bridge_song = BridgeSong.get_one(song_id=song.id)
+
+    n_root = Etree.Element("root")
+    render_song(n_root, song, bridge_song=bridge_song)
 
     return n_root
 
@@ -171,12 +215,16 @@ def route_action():
             'handshake': do_handshake,
             'ping': do_ping,
             'artists': do_artists,
+            'artist': do_artist,
             'albums': do_albums,
             'album': do_album,
             'playlists': do_playlists,
-            'song': do_song,
+            'playlist': do_playlist,
             'artist_albums': do_artist_albums,
-            'album_songs': do_album_songs
+            'song': do_song,
+            'album_songs': do_album_songs,
+            'artist_songs': do_artist_songs,
+            'url_to_song': url_to_song
         }[action]()
     except KeyError:
         e_root = Etree.Element("root")
