@@ -46,7 +46,10 @@ def stream_audio():
         range_end = None
         if range_bytes:
             range_start, range_end = range_bytes[6:].split("-")
-            range_end = None if range_end is "" else int(range_end)
+            try:
+                range_end = int(range_end)
+            except ValueError:
+                range_end = None
             range_start = int(range_start)
 
         if not range_end or range_end >= size:
