@@ -32,7 +32,7 @@ def render_song(n_root, song, bridge_song=None):
     a_node = Etree.SubElement(n_root, "song", id=str(bridge_song.id))
     Etree.SubElement(a_node, "title").text = song.title
     if song.track:
-        Etree.SubElement(a_node, "track").text = str(song.track())
+        Etree.SubElement(a_node, "track").text = str(song.track)
     Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
     if artist:
         Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
