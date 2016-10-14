@@ -76,8 +76,5 @@ def stream_audio():
         else:
             tc = audiotranscode.AudioTranscode()
             for data in tc.transcode_stream(path, 'mp3'):
-                yield str(len(data))
-                yield '\r\n'
                 yield data
-                yield '\r\n'
     return Response(generate_audio(), mimetype=mime, headers=headers, status=status)
