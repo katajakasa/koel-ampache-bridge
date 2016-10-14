@@ -54,17 +54,12 @@ def stream_audio():
         status = 206
 
     def generate_audio():
-        if not transcode:
-            with open(path, "rb") as handle:
-                handle.seek(range_start)
-                left = content_length
-                while left:
-                    r = 4096 if 4096 < left else left
-                    data = handle.read(4096)
-                    left -= r
-                    yield data
-        else:
-            tc = audiotranscode.AudioTranscode()
-            for data in tc.transcode_stream(path, 'mp3'):
+        with open(path, "rb") as handle:
+            handle.seek(range_start)
+            left = content_length
+            while left:
+                r = 4096 if 4096 < left else left
+                data = handle.read(4096)
+                left -= r
                 yield data
     return Response(generate_audio(), mimetype=mime, headers=headers, status=status)
