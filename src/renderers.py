@@ -11,6 +11,7 @@ def render_album(n_root, album):
     a_node = Etree.SubElement(n_root, "album", id=str(album.id))
     Etree.SubElement(a_node, "name").text = album.name
     Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
+    Etree.SubElement(a_node, "tracks").text = str(Song.query.filter(Song.album_id == album.id).count())
     if album.cover:
         Etree.SubElement(a_node, "art").text = "{}{}".format(config.BRIDGE_COVERS, album.cover)
 
