@@ -35,7 +35,6 @@ def stream_audio():
     # Send some extra headers
     headers = Headers()
     if transcode:
-        headers.add("Transfer-Encoding", "chunked")
         status = 200
     else:
         headers.add('Accept-Ranges', 'bytes')
@@ -77,9 +76,8 @@ def stream_audio():
         else:
             tc = audiotranscode.AudioTranscode()
             for data in tc.transcode_stream(path, 'mp3'):
-                hex_data = hexlify(data)
-                yield str(len(hex_data))
+                yield str(len(data))
                 yield '\r\n'
-                yield hex_data
+                yield data
                 yield '\r\n'
     return Response(generate_audio(), mimetype=mime, headers=headers, status=status)
