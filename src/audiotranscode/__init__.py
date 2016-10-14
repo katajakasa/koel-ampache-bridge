@@ -267,8 +267,7 @@ class AudioTranscode:
                     break
                 yield data
         except Exception as exc:
-            #pass on exception, but clean up
-            raise exc
+            raise
         finally:
             if decoder_process and decoder_process.poll() is None:
                 if decoder_process.stderr:
