@@ -34,6 +34,7 @@ def render_song(n_root, song, bridge_song=None):
     if song.track:
         Etree.SubElement(a_node, "track").text = str(song.track)
     Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
+    Etree.SubElement(a_node, "length").text = str(int(round(song.length)))
     if artist:
         Etree.SubElement(a_node, "artist", id=str(artist.id)).text = artist.name
     if album:
