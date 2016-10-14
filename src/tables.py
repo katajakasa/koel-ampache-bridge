@@ -85,3 +85,10 @@ class BridgeSession(db.Model, ModelHelperMixin):
     bridge_user = Column(ForeignKey('bridge_user.id'), nullable=False)
     created_at = Column(DateTime, nullable=True, default=None)
     updated_at = Column(DateTime, nullable=True, default=None)
+
+
+class BridgeSong(db.Model, ModelHelperMixin):
+    __tablename__ = "bridge_song"
+    id = Column(Integer, primary_key=True)
+    song_id = Column(String(32), nullable=False, index=True)
+

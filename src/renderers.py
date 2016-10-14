@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import xml.etree.cElementTree as Etree
-from tables import Artist, Album, Song, BridgeSession, BridgeUser, User, db
+from tables import Artist, Album, BridgeSong
 import config
 
 
@@ -22,11 +22,13 @@ def render_artist(n_root, artist):
     Etree.SubElement(a_node, "songs").text = "0"
 
 
-def render_song(n_root, song):
+def render_song(n_root, song, bridge_song=None):
     artist = Artist.get_one_or_none(id=song.contributing_artist_id)
     album = Album.get_one_or_none(id=song.album_id)
+    if not bridge_song:
+        bridge_song = BridgeSong.get_one(song_id=song.id)
 
-    a_node = Etree.SubElement(n_root, "song", id=str(song.id))
+    a_node = Etree.SubElement(n_root, "song", id=str(bridge_song.id))
     Etree.SubElement(a_node, "title").text = song.title
     Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
     if artist:

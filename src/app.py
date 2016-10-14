@@ -9,7 +9,7 @@ import hashlib
 from datetime import datetime
 
 from utils import generate_random_key
-from tables import Artist, Album, Song, BridgeSession, BridgeUser, User, db
+from tables import Artist, Album, Song, BridgeSession, BridgeUser, BridgeSong, User, db
 from renderers import render_album, render_artist, render_song
 import config
 
@@ -126,13 +126,25 @@ def do_artist_albums():
     return n_root
 
 
+def ensure_bridge_song(song):
+    try:
+        bs = BridgeSong.get_one(song_id=song.id)
+    except NoResultFound:
+        bs = BridgeSong()
+        bs.song_id = song.id
+        db.session.add(bs)
+        db.session.commit()
+    return bs
+
+
 @is_authenticated
 def do_album_songs():
     album_filter = request.args.get('filter', 0)
 
     n_root = Etree.Element("root")
     for song in Song.get_many(album_id=album_filter):
-        render_song(n_root, song)
+        bs = ensure_bridge_song(song)
+        render_song(n_root, song, bridge_song=bs)
 
     return n_root
 
@@ -141,9 +153,12 @@ def do_album_songs():
 def do_song():
     song_filter = request.args.get('filter', 0)
 
-    song = Song.get_one(id=song_filter)
+    # Bridge song is hacky POS, but required because some players expect Integer ID's
+    # and koel uses hash strings
+    bridge_song = BridgeSong.get_one(id=song_filter)
+    song = Song.get_one(id=bridge_song.song_id)
     n_root = Etree.Element("root")
-    render_song(n_root, song)
+    render_song(n_root, song, bridge_song=bs)
 
     return n_root
 
