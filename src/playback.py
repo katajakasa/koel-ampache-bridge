@@ -33,13 +33,12 @@ def stream_audio():
 
     # Send some extra headers
     headers = Headers()
+    headers.add('Accept-Ranges', 'bytes')
+    headers.add('Content-Transfer-Encoding', 'binary')
     if transcode:
-        headers.add('Content-Transfer-Encoding', 'binary')
+        headers.add("Content-Range", "bytes 0-")
         status = 200
     else:
-        headers.add('Content-Transfer-Encoding', 'binary')
-        headers.add('Accept-Ranges', 'bytes')
-
         # See if we got range
         range_bytes = request.headers.get('Range')
         range_start = 0
