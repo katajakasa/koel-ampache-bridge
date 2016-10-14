@@ -68,9 +68,9 @@ def do_handshake():
     Etree.SubElement(n_root, "update").text = arrow.get(ts).isoformat()
     Etree.SubElement(n_root, "add").text = arrow.get(ts).isoformat()
     Etree.SubElement(n_root, "clean").text = arrow.get(ts).isoformat()
-    Etree.SubElement(n_root, "songs").text = "0"
-    Etree.SubElement(n_root, "artists").text = "0"
-    Etree.SubElement(n_root, "albums").text = "0"
+    Etree.SubElement(n_root, "songs").text = str(Song.query.count())
+    Etree.SubElement(n_root, "artists").text = str(Artist.query.count())
+    Etree.SubElement(n_root, "albums").text = str(Album.query.count())
     Etree.SubElement(n_root, "tags").text = "0"
     Etree.SubElement(n_root, "videos").text = "0"
     return n_root

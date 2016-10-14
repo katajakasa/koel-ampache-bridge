@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import xml.etree.cElementTree as Etree
-from tables import Artist, Album, BridgeSong
+from tables import Artist, Album, Song, BridgeSong
 import config
 
 
@@ -18,8 +18,8 @@ def render_album(n_root, album):
 def render_artist(n_root, artist):
     a_node = Etree.SubElement(n_root, "artist", id=str(artist.id))
     Etree.SubElement(a_node, "name").text = artist.name
-    Etree.SubElement(a_node, "albums").text = "0"
-    Etree.SubElement(a_node, "songs").text = "0"
+    Etree.SubElement(a_node, "albums").text = str(Album.query.filter(Album.artist_id == artist.id).count())
+    Etree.SubElement(a_node, "songs").text = str(Song.query.filter(Song.contributing_artist_id == artist.id).count())
 
 
 def render_song(n_root, song, bridge_song=None):
