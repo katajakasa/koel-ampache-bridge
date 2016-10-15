@@ -2,11 +2,9 @@
 
 import mimetypes
 import os
-from binascii import hexlify
 
 from flask import Response, request
 from werkzeug.datastructures import Headers
-import audiotranscode
 
 from tables import Song
 import config
