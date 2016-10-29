@@ -4,3 +4,4 @@ flask-sqlalchemy
 tabulate
 pymysql
 uwsgi
+mutagen

@@ -3,6 +3,7 @@
 import xml.etree.cElementTree as Etree
 from tables import Artist, Album, Song, BridgeSong
 import config
+from utils import read_music_title
 
 
 def render_album(n_root, album):
@@ -30,9 +31,14 @@ def render_song(n_root, song, bridge_song=None):
         bridge_song = BridgeSong.get_one(song_id=song.id)
 
     a_node = Etree.SubElement(n_root, "song", id=str(bridge_song.id))
+
+    if not song.title or len(song.title) == 0:
+        song.title = read_music_title(song.path)
     Etree.SubElement(a_node, "title").text = song.title
+
     if song.track:
         Etree.SubElement(a_node, "track").text = str(song.track)
+
     Etree.SubElement(a_node, "url").text = "{}?id={}".format(config.BRIDGE_PLAY, song.id)
     Etree.SubElement(a_node, "length").text = str(int(round(song.length)))
     if artist:
